@@ -2,6 +2,12 @@
 
 A brand monitoring application built with the MERN stack (MongoDB, Express, React, Node.js). This tool uses hybrid collectors to gather data from various sources and performs sentiment and topic analysis.
 
+## Project Demo
+
+Click the thumbnail below to watch a video walkthrough of the application:
+
+[![MERN Brand Monitor Demo](https://img.youtube.com/vi/qfOe-frKRkw/hqdefault.jpg)](https://youtu.be/qfOe-frKRkw)
+
 ## Features
 
 - **Data Collection**: Gathers brand mentions from sources like Twitter and Reddit.
