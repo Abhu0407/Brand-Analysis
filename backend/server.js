@@ -14,64 +14,67 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-// make io available to routes/controllers
 app.set('io', io);
-
 app.use('/api', routes);
 
 const PORT = process.env.PORT || 4000;
-const MONGO = process.env.MONGO_URI || 'mongodb://localhost:27017/brand_monitor';
+const MONGO = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/brand_monitor';
 
-// Improved MongoDB connection with retry logic
 let mongoConnected = false;
+let retryInterval = null;
 
+// -------------------------------
+// MongoDB Connection Function
+// -------------------------------
 async function connectMongo() {
   try {
-    await mongoose.connect(MONGO, { 
-      useNewUrlParser: true, 
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of 30s
+    await mongoose.connect(MONGO, {
+      serverSelectionTimeoutMS: 5000, // 5s timeout
     });
+
     mongoConnected = true;
-    console.log('✓ Mongo connected');
+    console.log('✓ MongoDB connected');
+
     return true;
   } catch (err) {
-    console.error('✗ Mongo connection error:', err.message);
-    console.log('⚠ Server will start but collectors cannot save data without MongoDB');
-    console.log('  Make sure MongoDB is running or set MONGO_URI in .env file');
+    console.error('✗ MongoDB connection error:', err.message);
+    console.log('⚠ Collectors will not save data until MongoDB connects.');
     mongoConnected = false;
+
     return false;
   }
 }
 
-// Start server regardless of MongoDB connection status
+// -------------------------------
+// Start Server
+// -------------------------------
 async function startServer() {
+  // Try first connection
   await connectMongo();
-  
+
+  // Start Express Server Always
   server.listen(PORT, () => {
     console.log(`✓ Server running on port ${PORT}`);
+
     if (!mongoConnected) {
-      console.log('⚠ Warning: MongoDB not connected - data will not be saved');
+      console.log('⚠ MongoDB not connected — running in no-database mode.');
     }
   });
-  
-  // Start collectors manager (will handle MongoDB errors internally)
+
+  // Start collectors (they handle DB errors internally)
   collectors.start(io);
-  
-  // Retry MongoDB connection every 30 seconds if not connected
+
+  // Retry Logic (only one interval)
   if (!mongoConnected) {
-    const retryInterval = setInterval(async () => {
-      if (!mongoConnected) {
-        console.log('Retrying MongoDB connection...');
-        const connected = await connectMongo();
-        if (connected) {
-          clearInterval(retryInterval);
-          console.log('✓ MongoDB reconnected successfully');
-        }
-      } else {
+    retryInterval = setInterval(async () => {
+      console.log('Retrying MongoDB connection...');
+      const connected = await connectMongo();
+
+      if (connected) {
+        console.log('✓ MongoDB reconnected successfully');
         clearInterval(retryInterval);
       }
-    }, 30000);
+    }, 30000); // 30 seconds
   }
 }
 
