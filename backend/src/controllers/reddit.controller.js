@@ -1,57 +1,26 @@
 import RedditPost from "../models/reddit.model.js";
 import { collect as collectReddit } from "../collectors/redditCollector.js";
 
-// Helper: check if a post is inside timeline
-function isWithinTimeline(dateString, timeline) {
-  const postDate = new Date(dateString);
-  const now = new Date();
-
-  const diffDays = (now - postDate) / (1000 * 60 * 60 * 24);
-
-  if (timeline === "year") return diffDays <= 365;
-  if (timeline === "month") return diffDays <= 30;
-
-  return false;
-}
-
 // =========================
 // UPDATE USING COLLECTOR
 // =========================
 export const updateRedditPosts = async (req, res) => {
   try {
     const { brand } = req.params;
-    const { timeline } = req.query; // "year" or "month"
 
     if (!brand) return res.status(400).json({ message: "Brand required" });
-    if (!timeline) return res.status(400).json({ message: "Timeline required (year/month)" });
 
     // 1️⃣ Collect NEW LIVE DATA from Reddit
-    const scrapedData = await collectReddit(brand, timeline);
+    const scrapedData = await collectReddit(brand);
 
     if (!scrapedData || scrapedData.length === 0) {
       return res.status(404).json({ message: "No new data found from Reddit" });
     }
 
-    // 2️⃣ Delete outdated data only (not all)
-    let cutoffDate = new Date();
-    if (timeline === "year") {
-      cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
-    } else {
-      cutoffDate.setMonth(cutoffDate.getMonth() - 1);
-    }
-
-    const deletedOld = await RedditPost.deleteMany({
-      brand,
-      date: { $lt: cutoffDate }
-    });
-
-    // 3️⃣ Insert new valid posts (no duplicates)
+    // 2️⃣ Insert new valid posts (no duplicates)
     let insertedCount = 0;
 
     for (let post of scrapedData) {
-      // skip if outside timeline
-      if (!isWithinTimeline(post.date, timeline)) continue;
-
       // skip duplicates using URL
       const exists = await RedditPost.findOne({ url: post.url });
       if (!exists) {
@@ -62,7 +31,6 @@ export const updateRedditPosts = async (req, res) => {
 
     return res.status(200).json({
       message: "Reddit posts updated successfully",
-      deletedOutdated: deletedOld.deletedCount,
       newInserted: insertedCount
     });
 
@@ -80,22 +48,18 @@ export const saveRedditPosts = async (req, res) => {
     const posts = req.body;
 
     const { brand } = req.params;
-    const { timeline } = req.query; // "year" or "month"
 
     if (!brand) return res.status(400).json({ message: "Brand required" });
-    if (!timeline) return res.status(400).json({ message: "Timeline required (year/month)" });
 
     // 1️⃣ Collect NEW LIVE DATA from Reddit
-    const scrapedData = await collectReddit(brand, timeline);
+    const scrapedData = await collectReddit(brand);
 
     if (!scrapedData || scrapedData.length === 0) {
       return res.status(404).json({ message: "No new data found from Reddit" });
     }
 
+    let insertedCount = 0;
     for (let post of scrapedData) {
-      // skip if outside timeline
-      if (!isWithinTimeline(post.date, timeline)) continue;
-
       // skip duplicates using URL
       const exists = await RedditPost.findOne({ url: post.url });
       if (!exists) {
@@ -104,8 +68,7 @@ export const saveRedditPosts = async (req, res) => {
       }
     }
 
-    // const saved = await RedditPost.insertMany(posts);
-    return res.status(201).json({ message: "Saved", count: saved.length });
+    return res.status(201).json({ message: "Saved", count: insertedCount });
 
   } catch (err) {
     console.error("Save error:", err);

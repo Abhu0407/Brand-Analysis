@@ -110,29 +110,9 @@ async function fetchComments(videoId, apiKey) {
 }
 
 /*-----------------------------------------------------------
-   CHECK TIMELINE FILTER
+   MAIN FUNCTION
 -----------------------------------------------------------*/
-function isWithinTimeline(dateString, timeline) {
-  const videoDate = new Date(dateString);
-  const now = new Date();
-
-  if (timeline === "year") {
-    const diffYears = (now - videoDate) / (1000 * 60 * 60 * 24 * 365);
-    return diffYears <= 1;
-  }
-
-  if (timeline === "month") {
-    const diffMonths = (now - videoDate) / (1000 * 60 * 60 * 24 * 30);
-    return diffMonths <= 1;
-  }
-
-  return true; // default: no filter
-}
-
-/*-----------------------------------------------------------
-   MAIN FUNCTION (WITH TIMELINE)
------------------------------------------------------------*/
-async function collect(brand, timeline = "year") {
+async function collect(brand) {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) {
     console.log("❌ Missing YOUTUBE_API_KEY in .env");
@@ -162,12 +142,6 @@ async function collect(brand, timeline = "year") {
 
     // Fetch stats
     const stats = await fetchVideoStats(videoId, apiKey);
-
-    // Timeline filter
-    if (!isWithinTimeline(stats.publishedAt, timeline)) {
-      console.log(`⏭ Skipping video (outside ${timeline} timeline): ${title}`);
-      continue;
-    }
 
     console.log(`\n🎬 Analyzing Video: ${title}`);
 

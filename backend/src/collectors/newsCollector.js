@@ -53,27 +53,10 @@ function extractDate($) {
   return null;
 }
 
-// Validate month/year timeline
-function validateTimeline(date, timeline) {
-  if (!date) return false;
-
-  const now = new Date();
-  const diffMs = now - date;
-
-  const oneMonth = 30 * 24 * 60 * 60 * 1000;
-  const oneYear = 365 * 24 * 60 * 60 * 1000;
-
-  if (timeline === "month") return diffMs <= oneMonth;
-  if (timeline === "year") return diffMs <= oneYear;
-
-  return false;
-}
-
-async function collect(brand, timeline = "year") {
+async function collect(brand) {
   const results = [];
 
-  console.log(`\n🔍 Searching for brand: ${brand}`);
-  console.log(`⏱ Timeline filter: last 1 ${timeline}\n`);
+  console.log(`\n🔍 Searching for brand: ${brand}\n`);
 
   for (const site of NEWS_SITES) {
     console.log("🌐 Checking:", site);
@@ -93,17 +76,7 @@ async function collect(brand, timeline = "year") {
       continue;
     }
 
-    const date = extractDate($);
-
-    if (!date) {
-      console.log("⚠️ No date found → skipping");
-      continue;
-    }
-
-    if (!validateTimeline(date, timeline)) {
-      console.log("⏳ Outside timeline → skipping");
-      continue;
-    }
+    const date = extractDate($) || new Date();
 
     const text = $("body").text().trim().slice(0, 2000);
     const s = sentiment.analyze(text);

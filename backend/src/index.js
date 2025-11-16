@@ -9,6 +9,7 @@ import { connectDB } from "./lib/db.js";
 
 import authRoutes from "./routes/auth.route.js";
 import collectRoutes from "./routes/collect.route.js";
+import dashboardRoutes from "./routes/dashboard.route.js";
 import { app, server } from "./lib/socket.js";
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/collect", collectRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

@@ -51,51 +51,26 @@ export const deleteNews = async (req, res) => {
 
 export const updateNews = async (req, res) => {
   try {
-    const { brand, timeline } = req.body;
+    const { brand } = req.body;
 
-    if (!brand || !timeline) {
+    if (!brand) {
       return res.status(400).json({
         success: false,
-        message: "brand and timeline are required",
-      });
-    }
-
-    // Compute timeline limit
-    const now = new Date();
-    let limitDate = new Date();
-
-    if (timeline === "year") {
-      limitDate.setFullYear(now.getFullYear() - 1);
-    } else if (timeline === "month") {
-      limitDate.setMonth(now.getMonth() - 1);
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "timeline must be 'year' or 'month'",
+        message: "brand is required",
       });
     }
 
     // -----------------------------------------
-    // 1. Delete old data outside the timeline
+    // 1. Fetch new fresh news from scraper
     // -----------------------------------------
-    await NewsMention.deleteMany({
-      brand,
-      publishedAt: { $lt: limitDate },
-    });
-
-    console.log("⏳ Old data removed.");
-
-    // -----------------------------------------
-    // 2. Fetch new fresh news from scraper
-    // -----------------------------------------
-    const newNews = await collect(brand, timeline);
+    const newNews = await collect(brand);
 
     console.log("🔍 Fresh data collected:", newNews.length);
 
     let addedCount = 0;
 
     // -----------------------------------------
-    // 3. Add only new unique results
+    // 2. Add only new unique results
     // -----------------------------------------
     for (const item of newNews) {
       const exists = await NewsMention.findOne({
@@ -105,7 +80,7 @@ export const updateNews = async (req, res) => {
       });
 
       if (!exists) {
-        await NewsMention.create({ ...item, timeline });
+        await NewsMention.create(item);
         addedCount++;
       }
     }

@@ -51,25 +51,8 @@ async function getRedditComments(permalink) {
   }
 }
 
-function isWithinTimeline(createdUtc, timeline) {
-  const postDate = new Date(createdUtc * 1000);
-  const now = new Date();
-
-  const diffMs = now - postDate;
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-  if (timeline === "year") {
-    return diffDays <= 365;
-  }
-  if (timeline === "month") {
-    return diffDays <= 30;
-  }
-
-  return true; // fallback: include everything
-}
-
-async function collect(brand, timeline = "year") {
-  console.log(`🔍 Collecting Reddit posts for: ${brand} | timeline: ${timeline}`);
+async function collect(brand) {
+  console.log(`🔍 Collecting Reddit posts for: ${brand}`);
 
   try {
     const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(brand)}&limit=50`;
@@ -83,11 +66,6 @@ async function collect(brand, timeline = "year") {
 
     for (const post of posts) {
       const d = post.data;
-
-      // timeline filtering
-      if (!isWithinTimeline(d.created_utc, timeline)) {
-        continue;
-      }
 
       const text = `${d.title || ""}\n${d.selftext || ""}`;
       const senti = simpleSentiment(text);
@@ -106,8 +84,7 @@ async function collect(brand, timeline = "year") {
         dislikes: 0,
         num_comments: d.num_comments || 0,
         sentiment: senti,
-        commentSentiments,
-        timeline: timeline
+        commentSentiments
       };
 
       result.push(item);

@@ -2,36 +2,16 @@ import YouTubeAnalysis from "../models/youtube.model.js";
 import { collect } from "../collectors/youtubeCollector.js";
 
 /* -----------------------------------------------------------
-   Utility function to check timeline
------------------------------------------------------------ */
-function isWithinTimeline(dateString, timeline) {
-  const videoDate = new Date(dateString);
-  const now = new Date();
-
-  if (timeline === "year") {
-    const diffYears = (now - videoDate) / (1000 * 60 * 60 * 24 * 365);
-    return diffYears <= 1;
-  }
-
-  if (timeline === "month") {
-    const diffMonths = (now - videoDate) / (1000 * 60 * 60 * 24 * 30);
-    return diffMonths <= 1;
-  }
-
-  return true; // default: no filter
-}
-
-/* -----------------------------------------------------------
    SAVE NEW ANALYSIS (CREATE)
 ----------------------------------------------------------- */
 export const saveAnalysis = async (req, res) => {
   try {
-    const { brand, timeline } = req.body;
+    const { brand } = req.body;
 
     if (!brand) return res.status(400).json({ message: "Brand required" });
 
     // Collect fresh data from YouTube Collector
-    const videos = await collect(brand, timeline);
+    const videos = await collect(brand);
 
     if (!videos.length)
       return res.status(404).json({ message: "No videos found" });
@@ -39,7 +19,6 @@ export const saveAnalysis = async (req, res) => {
     // Save into DB
     const saved = await YouTubeAnalysis.create({
       brand,
-      timeline,
       channelName: videos[0].channelName,
       channelId: videos[0].channelId,
       videos,
@@ -60,7 +39,7 @@ export const saveAnalysis = async (req, res) => {
 ----------------------------------------------------------- */
 export const updateAnalysis = async (req, res) => {
   try {
-    const { brand, timeline } = req.body;
+    const { brand } = req.body;
 
     if (!brand) return res.status(400).json({ message: "Brand required" });
 
@@ -71,14 +50,9 @@ export const updateAnalysis = async (req, res) => {
       return res.status(404).json({ message: "No analysis found for brand" });
 
     // Step 2 → Fetch latest YouTube data
-    const latestVideos = await collect(brand, timeline);
+    const latestVideos = await collect(brand);
 
-    // Step 3 → DELETE old videos (outside timeline)
-    record.videos = record.videos.filter((v) =>
-      isWithinTimeline(v.publishedAt, timeline)
-    );
-
-    // Step 4 → ADD new videos that are not in database
+    // Step 3 → ADD new videos that are not in database
     latestVideos.forEach((newVid) => {
       const exists = record.videos.some((oldVid) => oldVid.videoId === newVid.videoId);
       if (!exists) {
@@ -87,7 +61,6 @@ export const updateAnalysis = async (req, res) => {
     });
 
     // Save updated record
-    record.timeline = timeline;
     await record.save();
 
     return res.status(200).json({

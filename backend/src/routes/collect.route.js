@@ -23,7 +23,7 @@ const router = express.Router();
 // ========================
 router.post('/youtube/save', saveAnalysis);
 router.put('/youtube/update', updateAnalysis);
-delete('/youtube/:id', deleteAnalysis);
+router.delete('/youtube/:id', deleteAnalysis);
 
 // ========================
 // REDDIT ROUTES

@@ -23,12 +23,8 @@ const userSchema = new mongoose.Schema(
     brandName: {
       type: String,
       default: "apple",
-    },
-    timeline:{
-      type: String,
-      enum: ["year", "month"],
-      default: "year", // optional default
     }
+    //
 
   },
   { timestamps: true }

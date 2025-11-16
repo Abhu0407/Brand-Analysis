@@ -87,11 +87,11 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic, brandName, timeline } = req.body;
+    const { profilePic, brandName } = req.body;
     const userId = req.user._id;
 
     // If nothing is provided
-    if (!profilePic && !brandName && !timeline) {
+    if (!profilePic && !brandName) {
       return res.status(400).json({ message: "Nothing to update" });
     }
 
@@ -102,9 +102,9 @@ export const updateProfile = async (req, res) => {
       const uploadResponse = await cloudinary.uploader.upload(profilePic);
       updateData.profilePic = uploadResponse.secure_url;
     }
-    if (timeline) {
-      updateData.timeline = timeline;
-    }
+    // if (timeline) {
+    //   updateData.timeline = timeline;
+    // }
 
     // If brand name provided → update brandName field
     if (brandName) {
