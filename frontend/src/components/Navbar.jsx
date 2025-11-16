@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { LogOut, MessageSquare, Settings, User } from "lucide-react";
+import { LogOut, MessageSquare, Settings, User, BarChart3, PieChart, Search } from "lucide-react";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
+  const location = useLocation();
 
   return (
     <header
@@ -19,6 +20,38 @@ const Navbar = () => {
               </div>
               <h1 className="text-lg font-bold">BrandGPT</h1>
             </Link>
+            
+            {authUser && (
+              <nav className="hidden md:flex items-center gap-2">
+                <Link
+                  to="/dashboard"
+                  className={`btn btn-sm btn-ghost gap-2 ${
+                    location.pathname === "/" || location.pathname === "/dashboard" ? "btn-active" : ""
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  Dashboard
+                </Link>
+                <Link
+                  to="/sentiment"
+                  className={`btn btn-sm btn-ghost gap-2 ${
+                    location.pathname === "/sentiment" ? "btn-active" : ""
+                  }`}
+                >
+                  <PieChart className="w-4 h-4" />
+                  Sentiment
+                </Link>
+                <Link
+                  to="/search"
+                  className={`btn btn-sm btn-ghost gap-2 ${
+                    location.pathname === "/search" ? "btn-active" : ""
+                  }`}
+                >
+                  <Search className="w-4 h-4" />
+                  Search
+                </Link>
+              </nav>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
