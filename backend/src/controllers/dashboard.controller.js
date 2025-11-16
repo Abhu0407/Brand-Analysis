@@ -63,7 +63,7 @@ const fetchRedditData = async (brand) => {
             } catch (e) {
                 dateStr = new Date(post.createdAt).toISOString().split('T')[0];
             }
-            
+
             const found = acc.find(d => d.date === dateStr);
             if (found) {
                 found.count++;
@@ -75,9 +75,9 @@ const fetchRedditData = async (brand) => {
 
         return {
             totalPosts: posts.length,
-            averageLikes: Math.round(totalLikes / posts.length * 10) / 10,
-            averageDislikes: Math.round(totalDislikes / posts.length * 10) / 10,
-            averageComments: Math.round(totalComments / posts.length * 10) / 10,
+            averageLikes: Math.round(totalLikes / posts.length),
+            averageDislikes: Math.round(totalDislikes / posts.length),
+            averageComments: Math.round(totalComments / posts.length),
             sentimentDistribution: {
                 positive: Math.round((sentimentCount.positive / posts.length) * 100),
                 neutral: Math.round((sentimentCount.neutral / posts.length) * 100),
@@ -145,8 +145,8 @@ const fetchYoutubeData = async (brand) => {
 
         return {
             totalVideos: filteredVideos.length,
-            averageLikes: Math.round(totalLikes / filteredVideos.length * 10) / 10,
-            averageComments: Math.round(totalComments / filteredVideos.length * 10) / 10,
+            averageLikes: Math.round(totalLikes / filteredVideos.length),
+            averageComments: Math.round(totalComments / filteredVideos.length),
             sentimentDistribution: {
                 positive: Math.round((sentimentCount.positive / filteredVideos.length) * 100),
                 neutral: Math.round((sentimentCount.neutral / filteredVideos.length) * 100),
@@ -228,9 +228,9 @@ const fetchNewsData = async (brand) => {
                 negative: Math.round((sentimentCount.negative / newsMentions.length) * 100)
             },
             sentimentScores: {
-                average: Math.round(averageScore * 100) / 100,
-                min: Math.min(...sentimentScores),
-                max: Math.max(...sentimentScores)
+                average: Math.round(averageScore),
+                min: Math.round(Math.min(...sentimentScores)),
+                max: Math.round(Math.max(...sentimentScores))
             },
             topSources,
             postsByDate: postsByDate.sort((a, b) => new Date(a.date) - new Date(b.date)),
@@ -328,10 +328,10 @@ export const getLatestRedditPosts = async (req, res) => {
         const posts = await RedditPost.find({
             brand
         })
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .select('title content url date likes dislikes num_comments sentiment author createdAt')
-        .lean();
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .select('title content url date likes dislikes num_comments sentiment author createdAt')
+            .lean();
 
         res.json(posts);
     } catch (error) {
@@ -387,10 +387,10 @@ export const getLatestNewsPosts = async (req, res) => {
         const news = await NewsMention.find({
             brand
         })
-        .sort({ publishedAt: -1 })
-        .limit(limit)
-        .select('site snippet publishedAt sentiment sentimentScore')
-        .lean();
+            .sort({ publishedAt: -1 })
+            .limit(limit)
+            .select('site snippet publishedAt sentiment sentimentScore')
+            .lean();
 
         res.json(news);
     } catch (error) {
