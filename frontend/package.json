@@ -1,0 +1,72 @@
+{
+  "name": "brand-monitor-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@headlessui/react": "^1.7.3",
+    "@heroicons/react": "^2.0.13",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.1.3",
+    "chart.js": "^4.2.1",
+    "d3": "^7.9.0",
+    "d3-cloud": "^1.2.7",
+    "date-fns": "^2.29.3",
+    "file-saver": "^2.0.5",
+    "framer-motion": "^10.3.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-d3-cloud": "^1.0.6",
+    "react-dom": "^18.3.1",
+    "react-draggable": "^4.4.5",
+    "react-dropzone": "^14.2.2",
+    "react-helmet-async": "^1.3.0",
+    "react-icons": "^4.6.0",
+    "react-markdown": "^8.0.4",
+    "react-router-dom": "^6.4.3",
+    "react-scripts": "5.0.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "react-toastify": "^9.0.8",
+    "recharts": "^2.1.16",
+    "tailwind-scrollbar": "^2.0.1",
+    "tailwindcss": "^3.2.1",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dev": "vite"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.19",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.12",
+    "postcss": "^8.4.18",
+    "vite": "^5.4.21"
+  }
+}
