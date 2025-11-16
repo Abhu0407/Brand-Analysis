@@ -6,6 +6,7 @@ A brand monitoring application built with the MERN stack (MongoDB, Express, Reac
 
 Click the thumbnail below to watch a video walkthrough of the application:
 
+Demo link :- https://youtu.be/qfOe-frKRkw
 [![MERN Brand Monitor Demo](https://img.youtube.com/vi/qfOe-frKRkw/hqdefault.jpg)](https://youtu.be/qfOe-frKRkw)
 
 ## Features
@@ -92,3 +93,4 @@ Follow these instructions to get a copy of the project up and running on your lo
   - Move data collectors to dedicated background workers (e.g., using message queues like RabbitMQ or a service like Bull).
   - Implement proper OAuth authentication flows for external APIs.
   - Add robust error handling and rate-limiting strategies to avoid being blocked by APIs.
+
